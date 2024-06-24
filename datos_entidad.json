@@ -1,0 +1,11 @@
+{
+  "entidad": "Task",
+  "paquete": "com.example.taskmanagement",
+  "propiedades": {
+    "title": "String",
+    "description": "String",
+    "dueDate": "LocalDate",
+    "tags": "List<String>",
+    "status": "boolean"
+  }
+}
