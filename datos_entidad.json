@@ -1,10 +1,10 @@
 {
   "entidad": "Task",
-  "paquete": "com.example.taskmanagement",
+  "paquete": "com.pablo.hexagonal_demo",
   "propiedades": {
     "title": "String",
     "description": "String",
-    "dueDate": "LocalDate",
+    "endDate": "LocalDate",
     "tags": "List<String>",
     "status": "boolean"
   }

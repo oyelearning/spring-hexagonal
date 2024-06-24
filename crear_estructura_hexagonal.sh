@@ -27,12 +27,14 @@ DIRECTORIO_REPOSITORIO="$DIRECTORIO_BASE/src/main/java/$(echo $PAQUETE | tr . /)
 DIRECTORIO_SERVICIO="$DIRECTORIO_BASE/src/main/java/$(echo $PAQUETE | tr . /)/application/service"
 DIRECTORIO_CONTROLADOR="$DIRECTORIO_BASE/src/main/java/$(echo $PAQUETE | tr . /)/infrastructure/controller"
 DIRECTORIO_CONFIGURACION="$DIRECTORIO_BASE/src/main/java/$(echo $PAQUETE | tr . /)/infrastructure/configuration"
+DIRECTORIO_INFRAESTRUCTURA_REPOSITORIO="$DIRECTORIO_BASE/src/main/java/$(echo $PAQUETE | tr . /)/infrastructure/repository"
 
 mkdir -p "$DIRECTORIO_ENTIDAD"
 mkdir -p "$DIRECTORIO_REPOSITORIO"
 mkdir -p "$DIRECTORIO_SERVICIO"
 mkdir -p "$DIRECTORIO_CONTROLADOR"
 mkdir -p "$DIRECTORIO_CONFIGURACION"
+mkdir -p "$DIRECTORIO_INFRAESTRUCTURA_REPOSITORIO"
 
 # Crear la entidad
 ENTIDAD_FILE="$DIRECTORIO_ENTIDAD/${ENTIDAD}.java"
@@ -65,19 +67,35 @@ done
 # Cerrar la entidad
 echo "}" >> "$ENTIDAD_FILE"
 
-# Crear el repositorio
+# Crear el repositorio en la capa de dominio
 REPOSITORIO_FILE="$DIRECTORIO_REPOSITORIO/${ENTIDAD}Repository.java"
 cat <<EOF > "$REPOSITORIO_FILE"
 package $PAQUETE.domain.repository;
 
 import $PAQUETE.domain.model.${ENTIDAD};
 import java.util.List;
+import java.util.Optional;
 
 public interface ${ENTIDAD}Repository {
     ${ENTIDAD} save(${ENTIDAD} ${ENTIDAD,,});
     List<${ENTIDAD}> findAll();
-    ${ENTIDAD} findById(String id);
+    Optional<${ENTIDAD}> findById(String id);
     void deleteById(String id);
+}
+EOF
+
+# Crear la implementación del repositorio en la capa de infraestructura
+INFRA_REPOSITORIO_FILE="$DIRECTORIO_INFRAESTRUCTURA_REPOSITORIO/${ENTIDAD}MongoRepository.java"
+cat <<EOF > "$INFRA_REPOSITORIO_FILE"
+package $PAQUETE.infrastructure.repository;
+
+import $PAQUETE.domain.model.${ENTIDAD};
+import $PAQUETE.domain.repository.${ENTIDAD}Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ${ENTIDAD}MongoRepository extends MongoRepository<${ENTIDAD}, String>, ${ENTIDAD}Repository {
 }
 EOF
 
@@ -91,6 +109,7 @@ import $PAQUETE.domain.repository.${ENTIDAD}Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ${ENTIDAD}Service {
@@ -109,7 +128,7 @@ public class ${ENTIDAD}Service {
         return ${ENTIDAD,,}Repository.findAll();
     }
 
-    public ${ENTIDAD} get${ENTIDAD}ById(String id) {
+    public Optional<${ENTIDAD}> get${ENTIDAD}ById(String id) {
         return ${ENTIDAD,,}Repository.findById(id);
     }
 
@@ -130,6 +149,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/${ENTIDAD,,}s")
@@ -149,7 +169,7 @@ public class ${ENTIDAD}Controller {
     }
 
     @GetMapping("/{id}")
-    public ${ENTIDAD} get${ENTIDAD}ById(@PathVariable String id) {
+    public Optional<${ENTIDAD}> get${ENTIDAD}ById(@PathVariable String id) {
         return ${ENTIDAD,,}Service.get${ENTIDAD}ById(id);
     }
 
@@ -165,6 +185,9 @@ CONFIGURACION_FILE="$DIRECTORIO_CONFIGURACION/MongoConfig.java"
 cat <<EOF > "$CONFIGURACION_FILE"
 package $PAQUETE.infrastructure.configuration;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 
@@ -174,6 +197,11 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     @Override
     protected String getDatabaseName() {
         return "task_management_db";
+    }
+
+    @Bean
+    public MongoClient mongoClient() {
+        return MongoClients.create("mongodb://localhost:27017");
     }
 }
 EOF
