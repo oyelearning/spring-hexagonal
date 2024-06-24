@@ -1,0 +1,116 @@
+{
+    "name": "prueba-hexagonal-backend",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+    "features": {
+      "ghcr.io/devcontainers/features/java:1": {
+        "version": "17",
+        "installMaven": true
+      }
+    },
+    "updateRemoteUserUID": true,
+    "containerEnv": {
+      "TZ": "Europe/Madrid"
+    },
+    "mounts": [
+      "type=volume,source=vscode-server-extensions-cache,target=/home/vscode/.vscode-server/extensionsCache",
+      "type=volume,source=sdkman-archives-cache,target=/opt/sdkman/archives",
+      "type=volume,source=m2-repository-cache,target=/home/vscode/.m2/repository",
+      "type=volume,source=nvm-cache,target=/opt/nvm/.cache",
+      "type=volume,source=node-cache,target=/home/vscode/.npm/_cacache"
+    ],
+    "runArgs": [
+      "--name=prueba-hexagonal-backend.local.computer",
+      "--network=prueba-hexagonal-network"
+    ],
+    "initializeCommand": "docker network inspect prueba-hexagonal-network || docker network create --driver bridge prueba-hexagonal-network",
+    "remoteUser": "root",
+    "postCreateCommand": "chown -R vscode:vscode /home/vscode/.vscode-server",
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "dbaeumer.vscode-eslint",
+          "SonarSource.sonarlint-vscode",
+          "vmware.vscode-boot-dev-pack",
+          "madhavd1.javadoc-tools",
+          "dgileadi.java-decompiler",
+          "vscjava.vscode-java-pack",
+          "vscjava.vscode-lombok",
+          "redhat.vscode-xml",
+          "ms-azuretools.vscode-docker",
+          "mongodb.mongodb-vscode"
+        ],
+        "settings": {
+          "java.import.exclusions": [
+            "**/.metadata/**",
+            "**/archetype-resources/**",
+            "**/META-INF/maven/**",
+            "**/NBG-Server/**"
+          ],
+          "java.completion.favoriteStaticMembers": [
+            "org.junit.Assert.*",
+            "org.junit.Assume.*",
+            "org.junit.jupiter.api.Assertions.*",
+            "org.junit.jupiter.api.Assumptions.*",
+            "org.junit.jupiter.api.DynamicContainer.*",
+            "org.junit.jupiter.api.DynamicTest.*",
+            "org.mockito.Mockito.*",
+            "org.mockito.ArgumentMatchers.*",
+            "org.mockito.Answers.*",
+            "org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*",
+            "org.springframework.test.web.servlet.result.MockMvcResultMatchers.*",
+            "org.assertj.core.api.Assertions.*",
+            "org.hamcrest.CoreMatchers.*",
+            "org.hamcrest.Matchers.*",
+            "io.restassured.RestAssured.*"
+          ],
+          "files.watcherExclude": {
+            "**/.git/objects/**": true,
+            "**/.git/subtree-cache/**": true,
+            "**/.hg/store/**": true,
+            "**/tmp/**": true,
+            "**/bower_components/**": true,
+            "**/dist/**": true,
+            "**/coverage/**": true
+          },
+          "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/tmp/**": true,
+            "**/.gradle": true,
+            "**/.idea": true,
+            "**/.mvn": true,
+            "**/.classpath": true,
+            "**/.project": true,
+            "**/.settings": true,
+            "**/.factorypath": true
+          },
+          "search.exclude": {
+            "**/bower_components": true,
+            "**/*.code-search": true,
+            "**/target/**": true,
+            "**/dist/**": true,
+            "**/coverage/**": true
+          },
+          "terminal.integrated.defaultProfile.linux": "bash",
+          "terminal.integrated.profiles.linux": {
+            "bash": {
+              "path": "/bin/bash",
+              "args": ["-i"]
+            }
+          },
+          "local-history.path": "/tmp",
+          "editor.renderControlCharacters": true,
+          "editor.detectIndentation": false,
+          "editor.tabSize": 2,
+          "editor.formatOnPaste": true,
+          "editor.formatOnSave": true,
+          "editor.formatOnType": true,
+          "workbench.editor.enablePreview": false
+        }
+      }
+    }
+  }
+  
